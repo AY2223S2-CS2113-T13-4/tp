@@ -1,5 +1,7 @@
 package seedu.apollo.command.task;
 
+import seedu.apollo.exception.task.EventEventClashException;
+import seedu.apollo.exception.module.EventModuleClashException;
 import seedu.apollo.exception.task.DateOverException;
 import seedu.apollo.ui.Parser;
 import seedu.apollo.storage.Storage;
@@ -115,13 +117,17 @@ public class AddCommand extends Command {
             throws UnexpectedException {
         int initialSize = taskList.size();
         try {
-            addTask(taskList);
+            addTask(taskList, moduleList);
         } catch (DateOverException e) {
             ui.printDateOverException(e);
             return;
         } catch (DateOrderException e) {
             ui.printDateOrderException();
             return;
+        } catch (EventModuleClashException e) {
+            ui.printEventModuleClashException();
+        } catch (EventEventClashException e) {
+            ui.printEventEventClashException();
         }
 
         assert (taskList.size() > initialSize) : "AddCommand : Task not added successfully";
@@ -138,12 +144,12 @@ public class AddCommand extends Command {
      * Adds a Task to the TaskList based on data in the class.
      *
      * @param taskList The TaskList to be added to.
-     * @throws DateOverException If any date of the task occurs before the current date.
-     * @throws DateOrderException If an Event's end date occurs before its start date.
+     * @throws DateOverException   If any date of the task occurs before the current date.
+     * @throws DateOrderException  If an Event's end date occurs before its start date.
      * @throws UnexpectedException If the command stored is not recognised.
      */
-    private void addTask(TaskList taskList)
-            throws DateOverException, DateOrderException, UnexpectedException {
+    private void addTask(TaskList taskList, ModuleList moduleList)
+            throws DateOverException, DateOrderException, UnexpectedException, EventEventClashException, EventModuleClashException {
         switch (command) {
         case COMMAND_TODO_WORD:
             taskList.add(new ToDo(desc));
@@ -152,7 +158,7 @@ public class AddCommand extends Command {
             taskList.add(new Deadline(desc, by));
             break;
         case COMMAND_EVENT_WORD:
-            taskList.add(new Event(desc, from, to));
+            taskList.add(new Event(desc, from, to, taskList, moduleList));
             break;
         default:
             throw new UnexpectedException("Adding Task");

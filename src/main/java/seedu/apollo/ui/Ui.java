@@ -447,4 +447,12 @@ public class Ui {
     public void printLessonExists() {
         System.out.println("This lesson type already exists for this lesson!");
     }
+
+    public void printEventModuleClashException() {
+        System.out.println("This event clashes with one of your classes!");
+    }
+
+    public void printEventEventClashException() {
+        System.out.println("This event clashes with another event already in taskList!");
+    }
 }

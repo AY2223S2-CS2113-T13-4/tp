@@ -1,6 +1,7 @@
 package seedu.apollo;
 
 import org.junit.jupiter.api.Test;
+import seedu.apollo.module.ModuleList;
 import seedu.apollo.storage.Storage;
 import seedu.apollo.task.TaskList;
 import seedu.apollo.ui.Ui;
@@ -15,7 +16,9 @@ class UiTest {
     void printList_normalInput_noExceptionThrown() throws IOException {
         Storage storage = new Storage("test.txt", "moduleData.txt");
         Ui ui = new Ui();
-        TaskList taskList = storage.loadTaskList(ui);
+        TaskList taskList = new TaskList();
+        ModuleList moduleList = new ModuleList();
+        TaskList taskList = storage.loadTaskList(ui, taskList, moduleList);
         assertDoesNotThrow(() -> ui.printList(taskList));
     }
 

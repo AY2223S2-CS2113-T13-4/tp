@@ -36,7 +36,7 @@ public class Apollo {
         try {
             moduleData = storage.loadModuleData();
             moduleList = storage.loadModuleList(ui, moduleData);
-            taskList = storage.loadTaskList(ui);
+            taskList = storage.loadTaskList(ui, taskList, moduleList);
             storage.updateTask(taskList);
             ui.printWelcomeMessage();
         } catch (IOException e) {

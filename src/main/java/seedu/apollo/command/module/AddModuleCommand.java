@@ -33,7 +33,7 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
     /**
      * Constructor for AddModuleCommand.
      *
-     * @param param The module code of the module to be added.
+     * @param param      The module code of the module to be added.
      * @param allModules The list of all modules.
      * @throws InvalidModule If the module code is invalid.
      */
@@ -88,11 +88,11 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
      * Checks if the module is already in the module list.
      *
      * @param moduleList The list of modules.
-     * @param module The module to be checked.
+     * @param module     The module to be checked.
      * @return True if the module is already in the list of modules.
      */
     public boolean isAdded(ModuleList moduleList, Module module) {
-        for (Module mod: moduleList) {
+        for (Module mod : moduleList) {
             if (mod.getCode().equals(module.getCode())) {
                 return true;
             }
@@ -100,6 +100,7 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
         return false;
     }
 
+   
     @Override
     public void execute(TaskList taskList, Ui ui, Storage storage, ModuleList moduleList, ModuleList allModules) {
         try {
@@ -143,34 +144,34 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
      *
      * @param moduleList The list of modules.
      * @param allModules Module backend data.
-     * @param args The arguments of the command.
+     * @param args       The arguments of the command.
      * @throws IllegalCommandException If the command is invalid.
-     * @throws ClassNotFoundException If the lesson type is invalid.
-     * @throws LessonAddedException If the lesson already exists.
+     * @throws ClassNotFoundException  If the lesson type is invalid.
+     * @throws LessonAddedException    If the lesson already exists.
      */
     private void handleMultiCommand(ModuleList moduleList, ModuleList allModules, String[] args)
             throws IllegalCommandException, ClassNotFoundException, LessonAddedException {
 
         LessonType lessonType = this.getCommand(args[1]);
         Module searchModule = null;
-        for (Module module1: allModules){
-            if (module1.getCode().equalsIgnoreCase(this.module.getCode())){
+        for (Module module1 : allModules) {
+            if (module1.getCode().equalsIgnoreCase(this.module.getCode())) {
                 searchModule = module1;
                 break;
             }
         }
 
-        if (this.isAdded(moduleList, module)){
+        if (this.isAdded(moduleList, module)) {
             int index = 0;
-            for (Module module: moduleList){
-                if (module.getCode().equals(this.module.getCode())){
+            for (Module module : moduleList) {
+                if (module.getCode().equals(this.module.getCode())) {
                     this.module.setTimetable(module.getModuleTimetable());
                     break;
                 }
                 index++;
             }
             module.setTimetable(moduleList.get(index).getModuleTimetable());
-            if (module.hasLessonType(lessonType)){
+            if (module.hasLessonType(lessonType)) {
                 throw new LessonAddedException();
             }
 
@@ -186,11 +187,11 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
     private void addTimetable(Module searchModule, LessonType lessonType, String args) throws ClassNotFoundException {
         Boolean isFound = false;
         ArrayList<Timetable> copyList = new ArrayList<>(searchModule.getModuleTimetable());
-        for (Timetable timetable: copyList){
+        for (Timetable timetable : copyList) {
             LessonType searchLessonType = determineLessonType(timetable.getLessonType());
-            if (searchLessonType.equals(lessonType) && timetable.getClassnumber().equals(args)){
+            if (searchLessonType.equals(lessonType) && timetable.getClassnumber().equals(args)) {
 
-                if (module.getModuleTimetable() == null){
+                if (module.getModuleTimetable() == null) {
                     module.createNewTimeTable();
                 }
                 module.getModuleTimetable().add(timetable);
@@ -198,7 +199,7 @@ public class AddModuleCommand extends Command implements seedu.apollo.utils.Logg
             }
         }
 
-        if (!isFound){
+        if (!isFound) {
             throw new ClassNotFoundException();
         }
     }

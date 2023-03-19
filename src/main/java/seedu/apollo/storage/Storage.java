@@ -2,13 +2,11 @@ package seedu.apollo.storage;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import seedu.apollo.exception.task.DateOverException;
+import seedu.apollo.exception.module.EventModuleClashException;
+import seedu.apollo.exception.task.*;
 import seedu.apollo.module.Timetable;
 import seedu.apollo.ui.Parser;
 import seedu.apollo.ui.Ui;
-import seedu.apollo.exception.task.DateOrderException;
-import seedu.apollo.exception.task.InvalidDeadline;
-import seedu.apollo.exception.task.InvalidEvent;
 import seedu.apollo.exception.utils.InvalidSaveFile;
 import seedu.apollo.module.Module;
 import seedu.apollo.module.ModuleList;
@@ -133,11 +131,11 @@ public class Storage implements seedu.apollo.utils.Logger {
      * @return TaskList of Tasks (containing data from save file / empty).
      * @throws IOException If save file is not found, and a new one cannot be created.
      */
-    public TaskList loadTaskList(Ui ui) throws IOException {
+    public TaskList loadTaskList(Ui ui,TaskList taskList, ModuleList moduleList) throws IOException {
         TaskList newTaskList = new TaskList();
         File save = new File(filePath);
         try {
-            newTaskList = readFileContents(save, ui);
+            newTaskList = readFileContents(save, ui,taskList,moduleList);
             return newTaskList;
         } catch (FileNotFoundException e) {
             save.createNewFile();
@@ -224,13 +222,13 @@ public class Storage implements seedu.apollo.utils.Logger {
      * @return TaskList of initialised Tasks based on uncorrupted data in save file.
      * @throws FileNotFoundException If the save file cannot be found at filePath.
      */
-    private static TaskList readFileContents(File save, Ui ui) throws FileNotFoundException {
+    private static TaskList readFileContents(File save, Ui ui,TaskList taskList, ModuleList moduleList) throws FileNotFoundException {
         Scanner s = new Scanner(save);
         TaskList newTaskList = new TaskList();
         int counter = 0;
         while (s.hasNext()) {
             try {
-                newTaskList.add(newTask(s.nextLine()));
+                newTaskList.add(newTask(s.nextLine(),taskList,moduleList));
                 counter++;
             } catch (InvalidSaveFile e) {
                 ui.printInvalidSaveFile(counter, filePath);
@@ -299,7 +297,7 @@ public class Storage implements seedu.apollo.utils.Logger {
      * @return Corresponding Task to data stored in {@code text}.
      * @throws InvalidSaveFile If any line in the input data is not of the right format.
      */
-    private static Task newTask(String text) throws InvalidSaveFile, DateOverException {
+    private static Task newTask(String text,TaskList taskList, ModuleList moduleList) throws InvalidSaveFile, DateOverException {
         char type = getType(text);
         Boolean isDone = isStatusDone(text);
         String param = getParam(text);
@@ -309,7 +307,7 @@ public class Storage implements seedu.apollo.utils.Logger {
         case TXT_DEADLINE_WORD:
             return newDeadline(isDone, param);
         case TXT_EVENT_WORD:
-            return newEvent(isDone, param);
+            return newEvent(isDone, param,taskList,moduleList);
         default:
             throw new InvalidSaveFile();
         }
@@ -345,7 +343,7 @@ public class Storage implements seedu.apollo.utils.Logger {
         return newDeadline;
     }
 
-    private static Event newEvent(Boolean isDone, String param) throws InvalidSaveFile, DateOverException {
+    private static Event newEvent(Boolean isDone, String param,TaskList taskList, ModuleList moduleList) throws InvalidSaveFile, DateOverException {
         final String[] paramAndFromTo;
         try {
             paramAndFromTo = Parser.parseEvent(param);
@@ -353,11 +351,15 @@ public class Storage implements seedu.apollo.utils.Logger {
             throw new InvalidSaveFile();
         }
         try {
-            Event newEvent = new Event(paramAndFromTo[0], paramAndFromTo[1], paramAndFromTo[2]);
+            Event newEvent = new Event(paramAndFromTo[0], paramAndFromTo[1], paramAndFromTo[2],taskList,moduleList);
             newEvent.setDone(isDone);
             return newEvent;
         } catch (DateOrderException e) {
             throw new InvalidSaveFile();
+        } catch (EventModuleClashException e) {
+            throw new EventModuleClashException;
+        } catch (EventEventClashException e) {
+            throw new EventEventClashException;
         }
     }
 
