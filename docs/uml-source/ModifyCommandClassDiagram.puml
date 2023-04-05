@@ -1,0 +1,81 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class ModifyCommand
+class TaskList
+interface LoggerInterface
+class Ui
+class Storage
+class ArrayList
+
+
+class ModifyCommand{
+    -logger: Logger
+    #command: String
+    #idx: int
+    +ModifyCommand(command: String,param: String idx: int)
+    +setUpLogger()
+    +execute(taskList: TaskList, ui: Ui, storage: Storage, moduleList:
+            ModuleList, allModules: ModuleList, calendar: Calendar)
+    -unmarkTask(taskList: TaskList, ui: Ui)
+    -markTaskAsDone(taskList: TaskList, ui: Ui)
+}
+
+
+
+interface LoggerInterface {
+    +setUpLogger()
+}
+
+abstract class Command {
+- isExit : Boolean = false
+    + execute(taskList: TaskList, ui: Ui, storage: Storage, moduleList: ModuleList, allModules: ModuleList, calendar: Calendar)
+    # setExit()
+    # getCommand(arg: String): LessonType
+}
+
+enum LessonType {
+    LECTURE
+    PACKAGED_LECTURE
+    SECTIONAL_TEACHING
+    DESIGN_LECTURE
+    TUTORIAL
+    PACKAGED_TUTORIAL
+    RECITATION
+    LABORATORY
+    WORKSHOP
+    SEMINAR_STYLE_MODULE_CLASS
+    MINI_PROJECT
+    TUTORIAL_TYPE_2
+}
+
+class Storage{
+    -TYPE_POS: int
+    -STATUS_POS: int
+    -PARAM_POS: int
+    -TXT_TODO_WORD: char
+    -TXT_DEADLINE_WORD: char
+    -TXT_EVENT_WORD: char
+    -logger:Logger
+     + Storage(filePath: String, moduleDataFilePath: String)
+     + setUpLogger()
+     + updateTask(taskList: TaskList)
+     + loadTaskList(ui: Ui): TaskList
+}
+class Calendar{
+}
+class ModuleList{
+}
+
+ArrayList <|-- TaskList
+Ui -.left-> ModifyCommand
+ModifyCommand <.. Storage
+ModifyCommand <.. ModuleList
+ArrayList <|-- ModuleList
+Calendar..> ModifyCommand
+Command <|-- ModifyCommand
+LoggerInterface <|-.- Storage
+LoggerInterface <|-.- ModifyCommand
+TaskList "modified"-- ModifyCommand
+TaskList <-left- Storage
+@enduml
