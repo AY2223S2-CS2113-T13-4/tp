@@ -63,15 +63,15 @@ public class AddCommand extends Command {
                 command.equals(COMMAND_EVENT_WORD)) : "AddCommand: Invalid Add Command";
         switch (command) {
         case COMMAND_TODO_WORD:
-            this.desc = param;
+            this.desc = param.trim();
             break;
         case COMMAND_DEADLINE_WORD:
-            String[] paramAndBy = Parser.parseDeadline(param);
+            String[] paramAndBy = Parser.parseDeadline(param.trim());
             this.desc = paramAndBy[0];
             this.by = paramAndBy[1];
             break;
         case COMMAND_EVENT_WORD:
-            String[] paramAndFromTo = Parser.parseEvent(param);
+            String[] paramAndFromTo = Parser.parseEvent(param.trim());
             this.desc = paramAndFromTo[0];
             this.from = paramAndFromTo[1];
             this.to = paramAndFromTo[2];
@@ -137,17 +137,17 @@ public class AddCommand extends Command {
             throws DateTimeParseException, DateOverException, DateOrderException, UnexpectedException {
         switch (command) {
         case COMMAND_TODO_WORD:
-            ToDo todo = new ToDo(desc);
+            ToDo todo = new ToDo(desc.trim());
             taskList.add(todo);
             checkForDeadlineTask(ui, todo);
             break;
         case COMMAND_DEADLINE_WORD:
-            Deadline deadline = new Deadline(desc, by);
+            Deadline deadline = new Deadline(desc.trim(), by.trim());
             warnDeadlineClash(ui, taskList, calendar, deadline.getByDate());
             taskList.add(deadline);
             break;
         case COMMAND_EVENT_WORD:
-            Event event = new Event(desc, from, to);
+            Event event = new Event(desc.trim(), from.trim(), to.trim());
             if (isClashingEvent(taskList, event.getToDate(), event.getFromDate())) {
                 ui.printClashingEventMessage();
             }
